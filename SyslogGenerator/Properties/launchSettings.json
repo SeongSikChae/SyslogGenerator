@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SyslogGenerator": {
+      "commandName": "Project",
+      "commandLineArgs": "--config FW_LOG_GEN.yml"
+    }
+  }
+}

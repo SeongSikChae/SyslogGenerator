@@ -1,10 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Version>1.0.0</Version>
+		<Revision></Revision>
+		<RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommandLineParser" Version="2.9.1" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+		<PackageReference Include="Serilog.Enrichers.Caller" Version="1.0.0" />
+		<PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+		<PackageReference Include="System.Configuration.Extensions" Version="1.0.1" />
+		<PackageReference Include="System.IO.Extensions" Version="1.0.0" />
+		<PackageReference Include="System.Threading.Extensions" Version="1.0.0" />
+		<PackageReference Include="YamlDotNet" Version="16.3.0" />
+	</ItemGroup>
+
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<Exec Command="git describe --long --always --exclude=* --abbrev=8" ConsoleToMSBuild="true">
+			<Output PropertyName="Revision" TaskParameter="ConsoleOutput" />
+		</Exec>
+	</Target>
+
+	<Target Name="SetRevision" AfterTargets="PreBuild">
+		<ItemGroup>
+			<AssemblyAttribute Include="SyslogGenerator.Revision">
+				<_Parameter1>$(Revision)</_Parameter1>
+			</AssemblyAttribute>
+		</ItemGroup>
+	</Target>
 
 </Project>

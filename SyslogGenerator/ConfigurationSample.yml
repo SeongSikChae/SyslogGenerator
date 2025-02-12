@@ -3,7 +3,7 @@ Mode: UDP
 Host: 127.0.0.1
 Port: 514
 EPS: 1
-Partition: 1
+SenderCount: 1
 LOG_FILE_PATH: Sample.log
 SendBufferSize: 65535
 LOG_FILE_ENCODING_CODEPAGE: 65001

@@ -20,9 +20,9 @@ namespace SyslogGenerator
 
 		public Task StartAsync(CancellationToken cancellationToken)
 		{
-			ArgumentNullException.ThrowIfNull(configuration.Partition);
+			ArgumentNullException.ThrowIfNull(configuration.SenderCount);
 
-			for (int index = 0; index < configuration.Partition.Value; index++)
+			for (int index = 0; index < configuration.SenderCount.Value; index++)
 			{
 				IGeneratorWorker worker;
 				switch (configuration.Mode)

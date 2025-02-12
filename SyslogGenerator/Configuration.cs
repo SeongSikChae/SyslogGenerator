@@ -17,7 +17,7 @@ namespace SyslogGenerator
 		public uint? EPS { get; set; }
 
 		[Property(PropertyType.UINT, DefaultValue = "1")]
-		public uint? Partition { get; set; }
+		public uint? SenderCount { get; set; }
 
 		[Property(PropertyType.STRING, required: true)]
 		public string LOG_FILE_PATH { get; set; } = null!;

@@ -26,8 +26,6 @@ namespace SyslogGenerator
 		private AtomicInt64? sendTotalCounter;
 		private AtomicInt64? fileQueueConsumeCounter;
 
-		private Thread? t;
-
 		public void Initialize()
 		{
 			ArgumentNullException.ThrowIfNull(configuration.SendBufferSize);

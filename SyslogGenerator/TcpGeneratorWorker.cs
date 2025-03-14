@@ -73,7 +73,7 @@ namespace SyslogGenerator
 					byte[] block = sendEncoding.GetBytes(log);
 					try
 					{
-						writer?.Write(block.Length);
+						writer?.Write(sendEncoding.GetBytes(block.Length.ToString()));
 						writer?.Write(SP);
 						writer?.Write(block);
 						writer?.Flush();

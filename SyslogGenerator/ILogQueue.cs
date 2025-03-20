@@ -61,6 +61,7 @@ namespace SyslogGenerator
 				if (fileStream.Length <= position)
 					position = 0;
 				using BufferedStream bufferedStream = new BufferedStream(fileStream);
+				bufferedStream.Seek(position, SeekOrigin.Begin);
 				using StreamReader streamReader = new StreamReader(bufferedStream, encoding: logFileEncoding);
 
 				StringBuilder builder = new StringBuilder();
@@ -70,34 +71,34 @@ namespace SyslogGenerator
 					if (cancellationToken.IsCancellationRequested)
 						break;
 
-					string? line = streamReader.ReadLine();
-					if (string.IsNullOrWhiteSpace(line))
-					{
-						position = streamReader.BaseStream.Position;
-						break;
-					}
-
 					if (cmdMain.Count.HasValue && cmdMain.Count.Value > 0)
 					{
 						if (readCount.Value >= cmdMain.Count.Value)
-						{
-							position = streamReader.BaseStream.Position;
 							return;
-						}
+					}
+
+					string? line = streamReader.ReadLine();
+					if (line is null)
+					{
+						position = 0;
+						break;
+					}
+
+					if (string.IsNullOrWhiteSpace(line))
+					{
+						position = position + logFileEncoding.GetByteCount(line) + logFileEncoding.GetByteCount(Environment.NewLine);
+						continue;
 					}
 
 					Enqueue(line);
 					if (cmdMain.Count.HasValue && cmdMain.Count.Value > 0)
 						readCount.IncrementThenGet();
 
-					if (streamReader.BaseStream.Position >= streamReader.BaseStream.Length) 
-					{
-						streamReader.BaseStream.Position = 0;
+					if (streamReader.BaseStream.Position >= streamReader.BaseStream.Length)
 						position = 0;
-					}
+					else
+						position = position + logFileEncoding.GetByteCount(line) + logFileEncoding.GetByteCount(Environment.NewLine);
 				}
-
-				position = streamReader.BaseStream.Position;
 			}
 		}
 

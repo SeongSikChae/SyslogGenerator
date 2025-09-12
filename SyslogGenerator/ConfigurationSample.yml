@@ -1,5 +1,8 @@
 ---
 Mode: UDP
+UseSecure: false
+# TrustStorePath: 
+# TrustStorePassword: 
 Host: 127.0.0.1
 Port: 514
 EPS: 1

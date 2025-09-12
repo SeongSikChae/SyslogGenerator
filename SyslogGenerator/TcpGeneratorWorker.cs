@@ -4,7 +4,8 @@ using System.Text;
 using System.Threading.Atomic;
 using System.Threading.PerformanceCounter;
 using Quartz;
-using Microsoft.Extensions.Logging;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 
 namespace SyslogGenerator
 {
@@ -15,7 +16,7 @@ namespace SyslogGenerator
 		private const byte SP = 0x20;
 
 		private Socket? socket;
-		private NetworkStream? networkStream;
+		private Stream? networkStream;
 		private BinaryReader? reader;
 		private BinaryWriter? writer;
 
@@ -31,12 +32,31 @@ namespace SyslogGenerator
 			ArgumentNullException.ThrowIfNull(configuration.SendBufferSize);
 			ArgumentNullException.ThrowIfNull(configuration.Port);
 			ArgumentNullException.ThrowIfNull(configuration.SEND_ENCODING_CODEPAGE);
+			ArgumentNullException.ThrowIfNull(configuration.UseSecure);
 
-			socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-			socket.SendBufferSize = configuration.SendBufferSize.Value;
-			socket.Connect(new IPEndPoint(IPAddress.Parse(configuration.Host), configuration.Port.Value));
+			if (configuration.UseSecure.Value)
+			{
+				ArgumentNullException.ThrowIfNull(configuration.TrustStorePath);
+                ArgumentNullException.ThrowIfNull(configuration.TrustStorePassword);
 
-			networkStream = new NetworkStream(socket);
+                X509Certificate2Collection certificates = new X509Certificate2Collection();
+				certificates.Import(configuration.TrustStorePath, configuration.TrustStorePassword, X509KeyStorageFlags.DefaultKeySet);
+
+                socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                socket.SendBufferSize = configuration.SendBufferSize.Value;
+                socket.Connect(new IPEndPoint(IPAddress.Parse(configuration.Host), configuration.Port.Value));
+				SslStream sslStream = new SslStream(new NetworkStream(socket));
+				sslStream.AuthenticateAsClient(configuration.Host);
+				networkStream = sslStream;
+            } 
+			else
+			{
+                socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                socket.SendBufferSize = configuration.SendBufferSize.Value;
+                socket.Connect(new IPEndPoint(IPAddress.Parse(configuration.Host), configuration.Port.Value));
+                networkStream = new NetworkStream(socket);
+            }
+			
 			reader = new BinaryReaderV2(networkStream, ByteOrder.BigEndian);
 			writer = new BinaryWriterV2(networkStream, ByteOrder.BigEndian);
 

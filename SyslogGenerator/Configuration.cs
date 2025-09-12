@@ -7,7 +7,16 @@ namespace SyslogGenerator
 		[Property(PropertyType.ENUM, DefaultValue = "UDP")]
 		public Mode? Mode { get; set; }
 
-		[Property(PropertyType.STRING, required: true)]
+		[Property(PropertyType.BOOL, DefaultValue = "false")]
+		public bool? UseSecure { get; set; }
+
+        [Property(PropertyType.STRING)]
+		public string? TrustStorePath { get; set; }
+
+        [Property(PropertyType.STRING)]
+		public string? TrustStorePassword { get; set; }
+
+        [Property(PropertyType.STRING, required: true)]
 		public string Host { get; set; } = null!;
 
 		[Property(PropertyType.USHORT, required: true)]

@@ -1,5 +1,6 @@
 ﻿
 using Quartz;
+using System.IO;
 using System.Collections.Concurrent;
 using System.Text;
 using System.Threading.Atomic;
@@ -81,13 +82,14 @@ namespace SyslogGenerator
 					if (line is null)
 					{
 						position = 0;
-						break;
+                        bufferedStream.Seek(position, SeekOrigin.Begin);
+                        continue;
 					}
 
 					if (string.IsNullOrWhiteSpace(line))
 					{
-						position = position + logFileEncoding.GetByteCount(line) + logFileEncoding.GetByteCount(Environment.NewLine);
-						continue;
+                        position = streamReader.GetPosition();
+                        continue;
 					}
 
 					Enqueue(line);
@@ -97,8 +99,8 @@ namespace SyslogGenerator
 					if (streamReader.BaseStream.Position >= streamReader.BaseStream.Length)
 						position = 0;
 					else
-						position = position + logFileEncoding.GetByteCount(line) + logFileEncoding.GetByteCount(Environment.NewLine);
-				}
+                        position = streamReader.GetPosition();
+                }
 			}
 		}
 
